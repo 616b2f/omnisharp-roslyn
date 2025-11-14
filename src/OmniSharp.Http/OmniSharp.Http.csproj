@@ -1,10 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net6.0;net472</TargetFrameworks>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-    </PropertyGroup>
-
     <ItemGroup Condition="'$(TargetFramework)' != 'net472'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>

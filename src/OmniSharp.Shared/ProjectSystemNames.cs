@@ -7,5 +7,6 @@
         public const string DotNetProjectSystem = "DotNetProjectSystem";
         public const string ScriptProjectSystem = "ScriptProjectSystem";
         public const string MiscellaneousFilesProjectSystem = "MiscellaneousFilesProjectSystem";
+        public const string BspProjectSystem = "BspProjectSystem";
     }
 }

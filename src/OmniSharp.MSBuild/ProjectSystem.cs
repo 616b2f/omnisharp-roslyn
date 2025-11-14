@@ -259,7 +259,8 @@ namespace OmniSharp.MSBuild
             await _manager.WaitForQueueEmptyAsync();
 
             return new MSBuildWorkspaceInfo(
-                _solutionFileOrRootPath, _manager.GetAllProjects(),
+                _solutionFileOrRootPath,
+                _manager.GetAllProjects(),
                 excludeSourceFiles: request?.ExcludeSourceFiles ?? false);
         }
 

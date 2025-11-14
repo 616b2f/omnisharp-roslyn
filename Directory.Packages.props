@@ -5,12 +5,12 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
 
         <OmniSharpExtensionsPackageVersion>0.19.9</OmniSharpExtensionsPackageVersion>
-        <MicrosoftExtensionPackageVersion>9.0.0</MicrosoftExtensionPackageVersion>
-        <MicrosoftBaseCommonLibraryVersion>9.0.0</MicrosoftBaseCommonLibraryVersion>
-        <MicrosoftTestPackageVersion>17.14.0-preview-25107-01</MicrosoftTestPackageVersion>
+        <MicrosoftExtensionPackageVersion>9.0.10</MicrosoftExtensionPackageVersion>
+        <MicrosoftBaseCommonLibraryVersion>9.0.10</MicrosoftBaseCommonLibraryVersion>
+        <MicrosoftTestPackageVersion>18.0.0</MicrosoftTestPackageVersion>
         <MSBuildPackageVersion>17.3.2</MSBuildPackageVersion>
         <NuGetPackageVersion>6.15.0-preview.1.86</NuGetPackageVersion>
-        <RoslynPackageVersion>5.1.0-1.25475.3</RoslynPackageVersion>
+        <RoslynPackageVersion>5.3.0-2.25557.5</RoslynPackageVersion>
         <XunitPackageVersion>2.8.1</XunitPackageVersion>
     </PropertyGroup>
 
@@ -27,7 +27,7 @@
 
         <PackageVersion Include="ICSharpCode.Decompiler" Version="9.1.0.7988" />
 
-        <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
+        <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
 
         <PackageVersion Include="Microsoft.Build" Version="$(MSBuildPackageVersion)" />
         <PackageVersion Include="Microsoft.Build.Framework" Version="$(MSBuildPackageVersion)" />
@@ -35,40 +35,40 @@
         <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="$(MSBuildPackageVersion)" />
         <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="$(MSBuildPackageVersion)" />
 
-        <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.AspNetCore" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp" Version="$(RoslynPackageVersion)" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp.CSharp" Version="$(RoslynPackageVersion)" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.AspNetCore" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp.CSharp" Version="5.3.0-2.25564.5" />
 
-        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.DependencyModel" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Options" Version="$(MicrosoftExtensionPackageVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(MicrosoftExtensionPackageVersion)" />
+        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyModel" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.11" />
+        <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.11" />
 
         <PackageVersion Include="Microsoft.IO.Redist" Version="6.1.0" />
 
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftTestPackageVersion)" />
-        <PackageVersion Include="Microsoft.TestPlatform.TranslationLayer" Version="$(MicrosoftTestPackageVersion)" />
-        <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="$(MicrosoftTestPackageVersion)" />
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageVersion Include="Microsoft.TestPlatform.TranslationLayer" Version="18.0.1" />
+        <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.0.1" />
 
-        <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
 
         <PackageVersion Include="NuGet.Common" Version="$(NuGetPackageVersion)" />
         <PackageVersion Include="NuGet.Configuration" Version="$(NuGetPackageVersion)" />
@@ -86,17 +86,19 @@
 
         <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
 
-        <PackageVersion Include="System.Collections.Immutable" Version="$(MicrosoftBaseCommonLibraryVersion)" />
-        <PackageVersion Include="System.ComponentModel.Composition" Version="$(MicrosoftBaseCommonLibraryVersion)" />
-        <PackageVersion Include="System.Composition" Version="$(MicrosoftBaseCommonLibraryVersion)" />
-        <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(MicrosoftBaseCommonLibraryVersion)" />
+        <PackageVersion Include="System.Collections.Immutable" Version="9.0.11" />
+        <PackageVersion Include="System.ComponentModel.Composition" Version="9.0.11" />
+        <PackageVersion Include="System.Composition" Version="9.0.11" />
+        <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.11" />
         <PackageVersion Include="System.Memory" Version="4.6.0" />
         <PackageVersion Include="System.Reflection.Metadata" Version="$(MicrosoftBaseCommonLibraryVersion)" />
         <PackageVersion Include="System.Text.Json" Version="$(MicrosoftBaseCommonLibraryVersion)" />
-        <PackageVersion Include="System.Threading.Tasks.Dataflow" Version="$(MicrosoftBaseCommonLibraryVersion)" />
+        <PackageVersion Include="System.Threading.Tasks.Dataflow" Version="9.0.11" />
         <PackageVersion Include="System.ValueTuple" Version="4.5.0" />
 
-        <PackageVersion Include="System.Reactive" Version="6.0.1" />
+        <PackageVersion Include="System.Reactive" Version="6.0.2" />
+
+        <PackageVersion Include="StreamJsonRpc" Version="2.22.23" />
 
         <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
         <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />

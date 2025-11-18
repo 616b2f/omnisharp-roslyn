@@ -44,7 +44,7 @@ namespace OmniSharp.Cake
         public string Key { get; } = "Cake";
         public string Language { get; } = Constants.LanguageNames.Cake;
         public IEnumerable<string> Extensions { get; } = new[] { ".cake" };
-        public bool EnabledByDefault { get; } = true;
+        public bool EnabledByDefault { get; } = false;
         public bool Initialized { get; private set; }
 
         [ImportingConstructor]

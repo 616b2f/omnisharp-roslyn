@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project>
 
   <PropertyGroup>
     <LangVersion>Preview</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <NoWarn>NU1701;NU5104;NU1901;NU1903</NoWarn>
     <IsPackable>false</IsPackable>
@@ -51,6 +50,42 @@
       <MaxVersion>15.1.0.0</MaxVersion>
     </SuggestedBindingRedirects>
   </ItemGroup>
+
+  <!-- <ItemGroup> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Workspaces, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Features, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Scripting, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp.Workspaces, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp.Features, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp.Scripting, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Elfie, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>1.0.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.ExternalAccess.AspNetCore, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp.CSharp, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!-- </ItemGroup> -->
 
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)/omnisharp.png" Pack="true" PackagePath="/images/omnisharp.png" />

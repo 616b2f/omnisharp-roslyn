@@ -47,7 +47,7 @@ namespace OmniSharp.Script
         public string Key { get; } = "Script";
         public string Language { get; } = LanguageNames.CSharp;
         public IEnumerable<string> Extensions { get; } = new[] { CsxExtension };
-        public bool EnabledByDefault { get; } = true;
+        public bool EnabledByDefault { get; } = false;
         public bool Initialized { get; private set; }
 
         public void Initalize(IConfiguration configuration)

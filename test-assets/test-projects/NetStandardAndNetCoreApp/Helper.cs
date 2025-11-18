@@ -11,8 +11,6 @@ namespace TestLibrary
             Console.WriteLine(typeof(JObject));
         }
 
-#if NETCOREAPP
         static void Main() => SayHi();
-#endif
     }
 }

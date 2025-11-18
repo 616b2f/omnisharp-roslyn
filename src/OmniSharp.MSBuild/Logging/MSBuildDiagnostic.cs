@@ -42,24 +42,8 @@ namespace OmniSharp.MSBuild.Logging
             // for MSB3644, we should print a different message on Unix because the default one is Windows-specific
             if (args.Code?.Equals("MSB3644", StringComparison.OrdinalIgnoreCase) == true)
             {
-                // https://github.com/dotnet/msbuild/issues/5820
-                // older versions of MSBuild incorrectly treat 'net5.0'/'net6.0' moniker as ".NETFramework,Version=v5.0/6.0"
-                // this creates a confusing error message which we convert into a more helpful one
-                if (args.Message.Contains(".NETFramework,Version=v5.0"))
-                {
-                    diagnosticText = Platform.Current.OperatingSystem == Utilities.OperatingSystem.Windows
-                    ? ErrorMessages.ReferenceAssembliesNotFoundNet50Windows : ErrorMessages.ReferenceAssembliesNotFoundNet50Unix;
-                }
-                else if (args.Message.Contains(".NETFramework,Version=v6.0"))
-                {
-                    diagnosticText = Platform.Current.OperatingSystem == Utilities.OperatingSystem.Windows
-                    ? ErrorMessages.ReferenceAssembliesNotFoundNet60Windows : ErrorMessages.ReferenceAssembliesNotFoundNet60Unix;
-                }
-                else
-                {
-                    diagnosticText = Platform.Current.OperatingSystem != Utilities.OperatingSystem.Windows
-                        ? ErrorMessages.ReferenceAssembliesNotFoundUnix : args.Message;
-                }
+                diagnosticText = Platform.Current.OperatingSystem != Utilities.OperatingSystem.Windows
+                    ? ErrorMessages.ReferenceAssembliesNotFoundUnix : args.Message;
             }
 
             return new MSBuildDiagnostic(MSBuildDiagnosticSeverity.Error,

@@ -5,8 +5,8 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
 
         <OmniSharpExtensionsPackageVersion>0.19.9</OmniSharpExtensionsPackageVersion>
-        <MicrosoftExtensionPackageVersion>9.0.10</MicrosoftExtensionPackageVersion>
-        <MicrosoftBaseCommonLibraryVersion>9.0.10</MicrosoftBaseCommonLibraryVersion>
+        <MicrosoftExtensionPackageVersion>9.0.11</MicrosoftExtensionPackageVersion>
+        <MicrosoftBaseCommonLibraryVersion>9.0.11</MicrosoftBaseCommonLibraryVersion>
         <MicrosoftTestPackageVersion>18.0.0</MicrosoftTestPackageVersion>
         <MSBuildPackageVersion>17.3.2</MSBuildPackageVersion>
         <NuGetPackageVersion>6.15.0-preview.1.86</NuGetPackageVersion>
@@ -20,32 +20,32 @@
 
         <PackageVersion Include="Cake.Scripting.Transport" Version="0.16.0" />
 
-        <PackageVersion Include="DiffPlex" Version="1.8.0" />
+        <PackageVersion Include="DiffPlex" Version="1.9.0" />
 
-        <PackageVersion Include="Dotnet.Script.DependencyModel" Version="1.5.0" />
-        <PackageVersion Include="Dotnet.Script.DependencyModel.NuGet" Version="1.5.0" />
+        <PackageVersion Include="Dotnet.Script.DependencyModel" Version="1.6.0" />
+        <PackageVersion Include="Dotnet.Script.DependencyModel.NuGet" Version="1.6.0" />
 
         <PackageVersion Include="ICSharpCode.Decompiler" Version="9.1.0.7988" />
 
         <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
 
-        <PackageVersion Include="Microsoft.Build" Version="$(MSBuildPackageVersion)" />
-        <PackageVersion Include="Microsoft.Build.Framework" Version="$(MSBuildPackageVersion)" />
-        <PackageVersion Include="Microsoft.Build.Locator" Version="1.6.10" />
-        <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="$(MSBuildPackageVersion)" />
-        <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="$(MSBuildPackageVersion)" />
+        <PackageVersion Include="Microsoft.Build" Version="17.11.48" />
+        <PackageVersion Include="Microsoft.Build.Framework" Version="17.14.28" />
+        <PackageVersion Include="Microsoft.Build.Locator" Version="1.10.12" />
+        <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
+        <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
 
-        <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.AspNetCore" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp" Version="5.3.0-2.25564.5" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp.CSharp" Version="5.3.0-2.25564.5" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.AspNetCore" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp" Version="5.3.0-2.25567.1" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp.CSharp" Version="5.3.0-2.25567.1" />
 
         <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.11" />
         <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.11" />
@@ -96,21 +96,15 @@
         <PackageVersion Include="System.Threading.Tasks.Dataflow" Version="9.0.11" />
         <PackageVersion Include="System.ValueTuple" Version="4.5.0" />
 
-        <PackageVersion Include="System.Reactive" Version="6.0.2" />
+        <PackageVersion Include="System.Reactive" Version="6.1.0" />
 
         <PackageVersion Include="StreamJsonRpc" Version="2.22.23" />
 
         <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
         <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
-        <PackageVersion Include="xunit" Version="$(XunitPackageVersion)" />
+        <PackageVersion Include="xunit" Version="2.9.3" />
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-        <PackageVersion Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
-        <PackageVersion Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
-        <PackageVersion Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
-        <PackageVersion Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
     </ItemGroup>
 </Project>

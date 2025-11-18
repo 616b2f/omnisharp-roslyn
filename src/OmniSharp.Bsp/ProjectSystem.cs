@@ -42,6 +42,7 @@ namespace OmniSharp.Bsp
         // private readonly IAnalyzerAssemblyLoader _assemblyLoader;
         private readonly Lazy<CSharpCompilationOptions> _compilationOptions;
         private string? _solutionFileOrRootPath;
+        private Task? _initializeTask;
 
         public string Key { get; } = "Bsp";
         public string Language { get; } = LanguageNames.CSharp;
@@ -60,8 +61,7 @@ namespace OmniSharp.Bsp
             IEventEmitter eventEmitter,
             IFileSystemWatcher fileSystemWatcher,
             FileSystemHelper fileSystemHelper,
-            ILoggerFactory loggerFactory,
-            IAnalyzerAssemblyLoader assemblyLoader)
+            ILoggerFactory loggerFactory)
         {
             _workspace = workspace;
             _loggerFactory = loggerFactory;
@@ -97,7 +97,7 @@ namespace OmniSharp.Bsp
             var serverCallbacksLogger = _loggerFactory.CreateLogger<ServerCallbacks>();
             _bspClient = _server.CreateClient(new ServerCallbacks(_environment.LogLevel, serverCallbacksLogger));
             _initializeInfo = _bspClient.BuildInitializeAsync(initParams, CancellationToken.None).GetAwaiter().GetResult();
-            _bspClient.BuildInitializedAsync().GetAwaiter().GetResult();
+            _initializeTask = _bspClient.BuildInitializedAsync();
 
             Initialized = true;
         }
@@ -137,7 +137,7 @@ namespace OmniSharp.Bsp
             return connectionDetails;
         }
 
-        public Task WaitForIdleAsync() { return Task.CompletedTask; }
+        public Task WaitForIdleAsync() { return _initializeTask ?? Task.CompletedTask; }
 
         async Task<object?> IProjectSystem.GetWorkspaceModelAsync(WorkspaceInformationRequest request)
         {

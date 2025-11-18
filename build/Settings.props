@@ -7,6 +7,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <NoWarn>NU1701;NU5104;NU1901;NU1903</NoWarn>
     <IsPackable>false</IsPackable>
     <Authors>OmniSharp Contributors</Authors>

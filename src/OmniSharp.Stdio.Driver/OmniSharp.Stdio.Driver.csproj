@@ -10,9 +10,7 @@
 
         <!-- Always run on the latest runtime installed. -->
         <RuntimeFrameworkVersion>8.0.0-rc.1.23371.2</RuntimeFrameworkVersion>
-
         <RollForward>LatestMajor</RollForward>
-        <SkipHostDlls>true</SkipHostDlls>
     </PropertyGroup>
 
     <ItemGroup>

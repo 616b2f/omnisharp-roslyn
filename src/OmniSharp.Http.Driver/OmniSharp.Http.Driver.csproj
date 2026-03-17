@@ -7,7 +7,6 @@
 
         <!-- Always run on the latest runtime installed. -->
         <RollForward>LatestMajor</RollForward>
-        <SkipHostDlls Condition="'$(TargetFramework)' != 'net472'">true</SkipHostDlls>
     </PropertyGroup>
 
     <ItemGroup>

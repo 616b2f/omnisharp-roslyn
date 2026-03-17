@@ -10,6 +10,95 @@
     <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
   </PropertyGroup>
 
-  <Import Project="build\Settings.props" />
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <NoWarn>NU1701;NU5104;NU1901;NU1903</NoWarn>
+    <IsPackable>false</IsPackable>
+    <Authors>OmniSharp Contributors</Authors>
+    <PackageTags>omnisharp;lsp;csharp;roslyn;language</PackageTags>
+    <PackageIcon>images/omnisharp.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/OmniSharp/omnisharp-roslyn</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/OmniSharp/omnisharp-roslyn.git</RepositoryUrl>
+
+    <OutputPath>$([System.IO.Path]::GetFullPath('$(RepositoryRootDirectory)bin\$(Configuration)\$(MSBuildProjectName)'))\</OutputPath>
+    <BaseIntermediateOutputPath>$([System.IO.Path]::GetFullPath('$(RepositoryRootDirectory)bin\obj\$(MSBuildProjectName)'))\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <AllowedReferenceRelatedFileExtensions>$(AllowedReferenceRelatedFileExtensions);.pdb</AllowedReferenceRelatedFileExtensions>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\build\OmniSharpKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SuggestedBindingRedirects Include="Microsoft.Build, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <MaxVersion>15.1.0.0</MaxVersion>
+    </SuggestedBindingRedirects>
+    <SuggestedBindingRedirects Include="Microsoft.Build.Framework, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <MaxVersion>15.1.0.0</MaxVersion>
+    </SuggestedBindingRedirects>
+    <SuggestedBindingRedirects Include="Microsoft.Build.Utilities.Core, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <MaxVersion>15.1.0.0</MaxVersion>
+    </SuggestedBindingRedirects>
+    <SuggestedBindingRedirects Include="Microsoft.Build.Tasks.Core, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <MaxVersion>15.1.0.0</MaxVersion>
+    </SuggestedBindingRedirects>
+  </ItemGroup>
+
+  <!-- <ItemGroup> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Workspaces, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Features, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Scripting, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp.Workspaces, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp.Features, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.CSharp.Scripting, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.Elfie, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>1.0.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.ExternalAccess.AspNetCore, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!--   <SuggestedBindingRedirects Include="Microsoft.CodeAnalysis.ExternalAccess.OmniSharp.CSharp, Culture=neutral, PublicKeyToken=31bf3856ad364e35"> -->
+  <!--     <MaxVersion>5.3.0.0</MaxVersion> -->
+  <!--   </SuggestedBindingRedirects> -->
+  <!-- </ItemGroup> -->
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)/omnisharp.png" Pack="true" PackagePath="/images/omnisharp.png" />
+  </ItemGroup>
 
 </Project>

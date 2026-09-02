@@ -61,7 +61,6 @@ Task("GitVersion")
 ///  Pre-build setup tasks.
 /// </summary>
 Task("Setup")
-    .IsDependentOn("ValidateMono")
     .IsDependentOn("InstallDotNetSdk");
 
 void InstallDotNetSdk(BuildEnvironment env, BuildPlan plan, string version, string installFolder, bool sharedRuntime = false, bool noPath = false)
@@ -132,13 +131,6 @@ Task("InstallDotNetSdk")
     Environment.SetEnvironmentVariable("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "true");
 
     Run(env.DotNetCommand, "--info");
-});
-
-Task("ValidateMono")
-    .WithCriteria(() => !Platform.Current.IsWindows)
-    .Does(() =>
-{
-    ValidateMonoVersion(buildPlan);
 });
 
 /// <summary>
@@ -335,41 +327,9 @@ Task("Test")
                 Run(xunitInstancePath, arguments, instanceFolder)
                     .ExceptionOnError($"Test {testProject} failed for {testTargetFramework}");
             }
-            else
-            {
-                // Copy the Mono-built Microsoft.Build.* binaries to the test folder.
-                // This is necessary to work around a Mono bug that is exasperated by xUnit.
-                CopyMonoMSBuildBinaries(instanceFolder);
-
-                Run("mono", $"\"{xunitInstancePath}\" {arguments}", instanceFolder)
-                    .ExceptionOnError($"Test {testProject} failed for net472");
-            }
         }
     }
 });
-
-void CopyMonoMSBuildBinaries(string outputFolder)
-{
-    var monoBasePath = Platform.Current.IsMacOS
-        ? "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono"
-        : "/usr/lib/mono";
-    var monoMSBuildPath = $"{monoBasePath}/msbuild/Current/bin";
-    DirectoryHelper.Copy(monoMSBuildPath, outputFolder, replaceFiles: false);
-
-    // Copy dependencies of Mono build
-    FileHelper.Copy(
-        source: CombinePaths(env.Folders.Tools, "SQLitePCLRaw.core", "lib", "netstandard2.0", "SQLitePCLRaw.core.dll"),
-        destination: CombinePaths(outputFolder, "SQLitePCLRaw.core.dll"),
-        overwrite: true);
-    FileHelper.Copy(
-        source: CombinePaths(env.Folders.Tools, "SQLitePCLRaw.provider.e_sqlite3", "lib", "netstandard2.0", "SQLitePCLRaw.provider.e_sqlite3.dll"),
-        destination: CombinePaths(outputFolder, "SQLitePCLRaw.provider.e_sqlite3.dll"),
-        overwrite: true);
-    FileHelper.Copy(
-        source: CombinePaths(env.Folders.Tools, "SQLitePCLRaw.bundle_green", "lib", "netstandard2.0", "SQLitePCLRaw.batteries_v2.dll"),
-        destination: CombinePaths(outputFolder, "SQLitePCLRaw.batteries_v2.dll"),
-        overwrite: true);
-}
 
 void CopyExtraDependencies(BuildEnvironment env, string outputFolder)
 {
@@ -439,82 +399,6 @@ XmlElement CreateBindingRedirect(XmlDocument document, AssemblyName assemblyName
 
     return dependentAssembly;
 }
-
-string PublishMonoBuild(string project, BuildEnvironment env, BuildPlan plan, string configuration)
-{
-    Information($"Publishing Mono build for {project}...");
-
-    var outputFolder = CombinePaths(env.Folders.ArtifactsPublish, project, "mono");
-
-    var buildFolder = CombinePaths(env.Folders.Bin, configuration, project, "net472");
-
-    DirectoryHelper.Copy(buildFolder, outputFolder, copySubDirectories: false);
-
-    CopyExtraDependencies(env, outputFolder);
-    UpdateBindingRedirects(outputFolder);
-
-    // Copy dependencies of Mono build
-    FileHelper.Copy(
-        source: CombinePaths(env.Folders.Tools, "SQLitePCLRaw.core", "lib", "netstandard2.0", "SQLitePCLRaw.core.dll"),
-        destination: CombinePaths(outputFolder, "SQLitePCLRaw.core.dll"),
-        overwrite: true);
-    FileHelper.Copy(
-        source: CombinePaths(env.Folders.Tools, "SQLitePCLRaw.provider.e_sqlite3", "lib", "netstandard2.0", "SQLitePCLRaw.provider.e_sqlite3.dll"),
-        destination: CombinePaths(outputFolder, "SQLitePCLRaw.provider.e_sqlite3.dll"),
-        overwrite: true);
-    FileHelper.Copy(
-        source: CombinePaths(env.Folders.Tools, "SQLitePCLRaw.bundle_green", "lib", "netstandard2.0", "SQLitePCLRaw.batteries_v2.dll"),
-        destination: CombinePaths(outputFolder, "SQLitePCLRaw.batteries_v2.dll"),
-        overwrite: true);
-
-    Package(project, "mono", outputFolder, env.Folders.ArtifactsPackage, env.Folders.DeploymentPackage);
-
-    return outputFolder;
-}
-
-string PublishMonoBuildForPlatform(string project, MonoRuntime monoRuntime, BuildEnvironment env, BuildPlan plan)
-{
-    Information("Publishing platform-specific Mono build: {0}", monoRuntime.PlatformName);
-
-    var outputFolder = CombinePaths(env.Folders.ArtifactsPublish, project, monoRuntime.PlatformName);
-
-    var sourceFolder = CombinePaths(env.Folders.ArtifactsPublish, project, "mono");
-    var omnisharpFolder = CombinePaths(outputFolder, "omnisharp");
-
-    DirectoryHelper.Copy(sourceFolder, omnisharpFolder, copySubDirectories: false);
-
-    var runScriptFile = CombinePaths(env.Folders.MonoPackaging, "run");
-    FileHelper.Copy(runScriptFile, CombinePaths(outputFolder, "run"), overwrite: true);
-    Run("chmod", $"+x \"{CombinePaths(outputFolder, "run")}\"");
-
-    CopyExtraDependencies(env, outputFolder);
-    UpdateBindingRedirects(omnisharpFolder);
-
-    Package(project, monoRuntime.PlatformName, outputFolder, env.Folders.ArtifactsPackage, env.Folders.DeploymentPackage);
-
-    return outputFolder;
-}
-
-Task("PublishMonoBuilds")
-    .IsDependentOn("Setup")
-    .WithCriteria(() => !Platform.Current.IsWindows)
-    .Does(() =>
-{
-    foreach (var project in buildPlan.HostProjects)
-    {
-        var outputFolder = PublishMonoBuild(project, env, buildPlan, configuration);
-
-        CreateRunScript(project, outputFolder, env.Folders.ArtifactsScripts);
-
-        if (publishAll)
-        {
-            foreach (var monoRuntime in env.BuildMonoRuntimes)
-            {
-                PublishMonoBuildForPlatform(project, monoRuntime, env, buildPlan);
-            }
-        }
-    }
-});
 
 Task("PublishNet6Builds")
     .IsDependentOn("Setup")
@@ -680,7 +564,6 @@ Task("PublishNuGet")
 
 Task("Publish")
     .IsDependentOn("Build")
-    .IsDependentOn("PublishMonoBuilds")
     .IsDependentOn("PublishNet6Builds")
     .IsDependentOn("PublishWindowsBuilds")
     .IsDependentOn("PublishNuGet");

@@ -120,20 +120,34 @@ namespace OmniSharp.Bsp
             var localBspDir = Path.Combine(_environment.TargetDirectory, "/.bsp");
             var userBspDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME") ??
                 (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("HOME")) ? ""
-                : Path.Combine(Environment.GetEnvironmentVariable("HOME")!, "/.local/share"));
+                : Path.Combine(Environment.GetEnvironmentVariable("HOME")!, "/.local/share/bsp/"));
             var systemBspDir = Environment.GetEnvironmentVariable("XDG_DATA_DIRS")
                 ?? "/usr/local/share/:/usr/share/";
 
-            var connectionDetailsFiles = Directory.GetFiles(localBspDir, "*.json");
+            string[] bspDirs = [
+                localBspDir,
+                userBspDir,
+                .. systemBspDir.Split(':')
+            ];
 
-            var connectionDetails = connectionDetailsFiles
-                .Select(static x => JsonSerializer.Deserialize<BspConnectionDetails>(x))
-                .Where(static x =>
-                    x is not null &&
-                    x.Languages is not null &&
-                    x.Languages.Contains(LanguageId.Csharp))
-                .OrderByDescending(static x => x!.BspVersion)
-                .FirstOrDefault();
+            BspConnectionDetails? connectionDetails = null;
+            foreach (var bspDir in bspDirs)
+            {
+                connectionDetails = Directory
+                    .GetFiles(localBspDir, "*.json")
+                    .Select(static x => JsonSerializer.Deserialize<BspConnectionDetails>(x))
+                    .Where(static x =>
+                        x is not null &&
+                        x.Languages is not null &&
+                        x.Languages.Contains(LanguageId.Csharp))
+                    .OrderByDescending(static x => x!.BspVersion)
+                    .FirstOrDefault();
+                if (connectionDetails is not null)
+                {
+                    break;
+                }
+            }
+
             return connectionDetails;
         }
 

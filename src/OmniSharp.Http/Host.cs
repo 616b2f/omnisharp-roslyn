@@ -38,24 +38,25 @@ namespace OmniSharp.Http
             var config = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
                 .AddCommandLine(new[] { "--server.urls", $"http://{_serverInterface}:{_serverPort}" });
 
-            var builder = new WebHostBuilder()
-                .UseKestrel(config => {
-                    config.AllowSynchronousIO = true;
-                })
-                .ConfigureServices(serviceCollection =>
-                {
-                    serviceCollection.AddSingleton(_environment);
-                    serviceCollection.AddSingleton(_sharedTextWriter);
-                    serviceCollection.AddSingleton(NullEventEmitter.Instance);
-                    serviceCollection.AddSingleton(_commandLinePlugins);
-                    serviceCollection.AddSingleton(new HttpEnvironment { Port = _serverPort });
-                })
-                .UseUrls($"http://{_serverInterface}:{_serverPort}")
-                .UseConfiguration(config.Build())
-                .UseEnvironment("OmniSharp")
-                .UseStartup(typeof(Startup));
-
-            using (var app = builder.Build())
+            using (var app = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+                .ConfigureWebHost(builder => builder
+                    .UseKestrel(config =>
+                    {
+                        config.AllowSynchronousIO = true;
+                    })
+                    .ConfigureServices(serviceCollection =>
+                    {
+                        serviceCollection.AddSingleton(_environment);
+                        serviceCollection.AddSingleton(_sharedTextWriter);
+                        serviceCollection.AddSingleton(NullEventEmitter.Instance);
+                        serviceCollection.AddSingleton(_commandLinePlugins);
+                        serviceCollection.AddSingleton(new HttpEnvironment { Port = _serverPort });
+                    })
+                    .UseUrls($"http://{_serverInterface}:{_serverPort}")
+                    .UseConfiguration(config.Build())
+                    .UseEnvironment("OmniSharp")
+                    .UseStartup(typeof(Startup)))
+                .Build())
             {
                 app.Start();
 

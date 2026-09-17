@@ -256,7 +256,7 @@ void BuildWithDotNetCli(BuildEnvironment env, string configuration)
         .WithProperty("AssemblyVersion", env.VersionInfo.AssemblySemVer)
         .WithProperty("FileVersion", env.VersionInfo.AssemblySemVer)
         .WithProperty("InformationalVersion", env.VersionInfo.InformationalVersion)
-        .WithProperty("RuntimeFrameworkVersion", "6.0.0-preview.7.21317.1") // Set the minimum runtime to a .NET 6 prerelease so that prerelease SDKs will be considered during rollForward.
+        .WithProperty("RuntimeFrameworkVersion", "10.0.0")
         .WithProperty("RollForward", "LatestMajor");
 
     DotNetMSBuild("OmniSharp.sln", settings);
@@ -400,7 +400,7 @@ XmlElement CreateBindingRedirect(XmlDocument document, AssemblyName assemblyName
     return dependentAssembly;
 }
 
-Task("PublishNet6Builds")
+Task("PublishNet10Builds")
     .IsDependentOn("Setup")
     .Does(() =>
 {
@@ -410,52 +410,55 @@ Task("PublishNet6Builds")
         {
             if (Platform.Current.IsWindows)
             {
-                PublishBuild(project, env, buildPlan, configuration, "win7-x86", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "win7-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "win10-arm64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-x86", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-arm64", "net10.0");
             }
             else if (Platform.Current.IsMacOS)
             {
-                PublishBuild(project, env, buildPlan, configuration, "osx-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "osx-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", "net10.0");
             }
             else
             {
-                PublishBuild(project, env, buildPlan, configuration, "linux-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-bionic-arm64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", "net10.0");
+                if (project == "OmniSharp.Stdio.Driver")
+                {
+                    PublishBuild(project, env, buildPlan, configuration, "linux-bionic-arm64", "net10.0");
+                }
             }
         }
         else if (Platform.Current.IsWindows)
         {
             if (Platform.Current.IsX86)
             {
-                PublishBuild(project, env, buildPlan, configuration, "win7-x86", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-x86", "net10.0");
             }
             else if (Platform.Current.IsX64)
             {
-                PublishBuild(project, env, buildPlan, configuration, "win7-x64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-x64", "net10.0");
             }
             else
             {
-                PublishBuild(project, env, buildPlan, configuration, "win10-arm64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-arm64", "net10.0");
             }
         }
         else
         {
             if (Platform.Current.IsMacOS)
             {
-                PublishBuild(project, env, buildPlan, configuration, "osx-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "osx-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", "net10.0");
             }
             else
             {
-                PublishBuild(project, env, buildPlan, configuration, "linux-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", "net6.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", "net6.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", "net10.0");
             }
         }
     }
@@ -471,6 +474,19 @@ string PublishBuild(string project, BuildEnvironment env, BuildPlan plan, string
 
     try
     {
+        var msBuildSettings = new DotNetMSBuildSettings()
+            .WithProperty("PackageVersion", env.VersionInfo.NuGetVersion)
+            .WithProperty("AssemblyVersion", env.VersionInfo.AssemblySemVer)
+            .WithProperty("FileVersion", env.VersionInfo.AssemblySemVer)
+            .WithProperty("InformationalVersion", env.VersionInfo.InformationalVersion)
+            .WithProperty("RuntimeFrameworkVersion", "10.0.0")
+            .WithProperty("RollForward", "LatestMajor");
+
+        if (framework == "net472")
+        {
+            msBuildSettings.WithProperty("UseRidGraph", "true");
+        }
+
         var publishSettings = new DotNetPublishSettings()
         {
             Framework = framework,
@@ -479,13 +495,7 @@ string PublishBuild(string project, BuildEnvironment env, BuildPlan plan, string
             SelfContained = false, // Since we are specifying a runtime identifier this defaults to true. We don't need to ship a runtime for net6 because we require the .NET SDK to be installed.
             Configuration = configuration,
             OutputDirectory = outputFolder,
-            MSBuildSettings = new DotNetMSBuildSettings()
-                .WithProperty("PackageVersion", env.VersionInfo.NuGetVersion)
-                .WithProperty("AssemblyVersion", env.VersionInfo.AssemblySemVer)
-                .WithProperty("FileVersion", env.VersionInfo.AssemblySemVer)
-                .WithProperty("InformationalVersion", env.VersionInfo.InformationalVersion)
-                .WithProperty("RuntimeFrameworkVersion", "6.0.0-preview.7.21317.1") // Set the minimum runtime to a .NET 6 prerelease so that prerelease SDKs will be considered during rollForward.
-                .WithProperty("RollForward", "LatestMajor"),
+            MSBuildSettings = msBuildSettings,
             ToolPath = env.DotNetCommand,
             WorkingDirectory = env.WorkingDirectory,
             Verbosity = DotNetVerbosity.Minimal,
@@ -564,7 +574,7 @@ Task("PublishNuGet")
 
 Task("Publish")
     .IsDependentOn("Build")
-    .IsDependentOn("PublishNet6Builds")
+    .IsDependentOn("PublishNet10Builds")
     .IsDependentOn("PublishWindowsBuilds")
     .IsDependentOn("PublishNuGet");
 

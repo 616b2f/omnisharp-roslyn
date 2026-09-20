@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.IO;
@@ -67,7 +67,7 @@ namespace OmniSharp.Script
                         dependencyResolverLogger.LogCritical(exception, message);
                     }
                 });
-            });
+            }, cachePath: null);
         }
 
         public ScriptContext CreateScriptContext(ScriptOptions scriptOptions, string[] allCsxFiles, bool editorConfigEnabled)

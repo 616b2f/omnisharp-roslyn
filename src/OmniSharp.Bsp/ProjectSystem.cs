@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.IO;
@@ -117,34 +117,65 @@ namespace OmniSharp.Bsp
             // else
             // {
             // }
-            var localBspDir = Path.Combine(_environment.TargetDirectory, "/.bsp");
+            var localBspDir = Path.Combine(_environment.TargetDirectory, ".bsp");
+            var home = Environment.GetEnvironmentVariable("HOME");
             var userBspDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME") ??
-                (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("HOME")) ? ""
-                : Path.Combine(Environment.GetEnvironmentVariable("HOME")!, "/.local/share/bsp/"));
+                (string.IsNullOrWhiteSpace(home) ? ""
+                : Path.Combine(home, ".local", "share", "bsp"));
             var systemBspDir = Environment.GetEnvironmentVariable("XDG_DATA_DIRS")
                 ?? "/usr/local/share/:/usr/share/";
 
             string[] bspDirs = [
                 localBspDir,
                 userBspDir,
-                .. systemBspDir.Split(':')
+                .. systemBspDir.Split(':', StringSplitOptions.RemoveEmptyEntries).Select(d => Path.Combine(d, "bsp"))
             ];
+
+            var serializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
 
             BspConnectionDetails? connectionDetails = null;
             foreach (var bspDir in bspDirs)
             {
-                connectionDetails = Directory
-                    .GetFiles(localBspDir, "*.json")
-                    .Select(static x => JsonSerializer.Deserialize<BspConnectionDetails>(x))
-                    .Where(static x =>
-                        x is not null &&
-                        x.Languages is not null &&
-                        x.Languages.Contains(LanguageId.Csharp))
-                    .OrderByDescending(static x => x!.BspVersion)
-                    .FirstOrDefault();
-                if (connectionDetails is not null)
+                if (string.IsNullOrWhiteSpace(bspDir) || !Directory.Exists(bspDir))
                 {
-                    break;
+                    continue;
+                }
+
+                try
+                {
+                    connectionDetails = Directory
+                        .GetFiles(bspDir, "*.json")
+                        .Select(filePath =>
+                        {
+                            try
+                            {
+                                var json = File.ReadAllText(filePath);
+                                return JsonSerializer.Deserialize<BspConnectionDetails>(json, serializerOptions);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogWarning(ex, $"Failed to deserialize BSP connection details from '{filePath}'");
+                                return null;
+                            }
+                        })
+                        .Where(static x =>
+                            x is not null &&
+                            x.Languages is not null &&
+                            x.Languages.Contains(LanguageId.Csharp))
+                        .OrderByDescending(static x => x!.BspVersion)
+                        .FirstOrDefault();
+
+                    if (connectionDetails is not null)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Failed to search for BSP connection details in '{bspDir}'");
                 }
             }
 
@@ -158,13 +189,13 @@ namespace OmniSharp.Bsp
             if (!Initialized)
             {
                 _logger.LogError("Not initialized yet");
-                return Task.FromResult<object?>(null);
+                return null;
             }
 
             var workspaceResult = await _bspClient!.WorkspaceBuildTargetsAsync(CancellationToken.None);
             var slnTarget = workspaceResult.Targets
                 .Where(static x => x.LanguageIds.Contains(LanguageId.Csharp))
-                .OrderByDescending(static x => Path.GetExtension(x.Id.Uri.AbsolutePath) == "sln")
+                .OrderByDescending(static x => string.Equals(Path.GetExtension(x.Id.Uri.AbsolutePath), ".sln", StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             if (slnTarget == null)
@@ -177,11 +208,11 @@ namespace OmniSharp.Bsp
             if (_solutionFileOrRootPath is null)
             {
                 _logger.LogError("No solution file and no root dir found");
-                return Task.FromResult<object?>(null);
+                return null;
             }
 
             var allProjects = workspaceResult.Targets
-                .Where(static x => Path.GetExtension(x.Id.Uri.AbsolutePath) == "csproj");
+                .Where(static x => string.Equals(Path.GetExtension(x.Id.Uri.AbsolutePath), ".csproj", StringComparison.OrdinalIgnoreCase));
 
 
             // TODO: implement editorconfig handling
@@ -217,20 +248,20 @@ namespace OmniSharp.Bsp
             if (!Initialized)
             {
                 _logger.LogError("Not initialized yet");
-                return Task.FromResult<object?>(null);
+                return null;
             }
 
             var workspaceResult = await _bspClient!.WorkspaceBuildTargetsAsync(CancellationToken.None);
 
             var project = workspaceResult.Targets
                 .SingleOrDefault(x =>
-                    Path.GetExtension(x.Id.Uri.AbsolutePath) == "csproj" &&
+                    string.Equals(Path.GetExtension(x.Id.Uri.AbsolutePath), ".csproj", StringComparison.OrdinalIgnoreCase) &&
                     string.Equals(x.Id.Uri.AbsolutePath, filePath, StringComparison.OrdinalIgnoreCase));
 
             if (project is null)
             {
                 _logger.LogDebug($"Could not locate project for '{filePath}'");
-                return Task.FromResult<object?>(null);
+                return null;
             }
 
             return project;

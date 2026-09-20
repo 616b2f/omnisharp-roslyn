@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using OmniSharp.Utilities;
@@ -20,7 +20,9 @@ namespace TestUtility
         private TestAssets()
         {
             RootFolder = FindRootFolder();
-            OmniSharpSolutionPath = Path.Combine(RootFolder, "OmniSharp.sln");
+            OmniSharpSolutionPath = File.Exists(Path.Combine(RootFolder, "OmniSharp.slnx"))
+                ? Path.Combine(RootFolder, "OmniSharp.slnx")
+                : Path.Combine(RootFolder, "OmniSharp.sln");
             TestAssetsFolder = Path.Combine(RootFolder, "test-assets");
             TestProjectsFolder = Path.Combine(TestAssetsFolder, "test-projects");
             TestScriptsFolder = Path.Combine(TestAssetsFolder, "test-scripts");
@@ -31,7 +33,7 @@ namespace TestUtility
         private static string FindRootFolder()
         {
             var current = Directory.GetCurrentDirectory();
-            while (!File.Exists(Path.Combine(current, "OmniSharp.sln")))
+            while (!File.Exists(Path.Combine(current, "OmniSharp.slnx")) && !File.Exists(Path.Combine(current, "OmniSharp.sln")))
             {
                 current = Path.GetDirectoryName(current);
                 if (Path.GetPathRoot(current) == current)

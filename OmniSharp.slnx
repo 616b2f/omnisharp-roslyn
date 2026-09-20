@@ -19,6 +19,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/OmniSharp.Abstractions/OmniSharp.Abstractions.csproj" />
+    <Project Path="src/OmniSharp.Bsp/OmniSharp.Bsp.csproj" />
     <Project Path="src/OmniSharp.Cake/OmniSharp.Cake.csproj" />
     <Project Path="src/OmniSharp.DotNetTest/OmniSharp.DotNetTest.csproj" />
     <Project Path="src/OmniSharp.Host/OmniSharp.Host.csproj" />
@@ -34,6 +35,7 @@
     <Project Path="src/OmniSharp.Stdio/OmniSharp.Stdio.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/OmniSharp.Bsp.Tests/OmniSharp.Bsp.Tests.csproj" />
     <Project Path="tests/OmniSharp.Cake.Tests/OmniSharp.Cake.Tests.csproj" />
     <Project Path="tests/OmniSharp.DotNetTest.Tests/OmniSharp.DotNetTest.Tests.csproj" />
     <Project Path="tests/OmniSharp.Http.Tests/OmniSharp.Http.Tests.csproj" />

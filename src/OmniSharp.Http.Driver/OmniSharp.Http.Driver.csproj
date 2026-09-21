@@ -1,6 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <PlatformTarget>AnyCPU</PlatformTarget>
         <AssemblyName>OmniSharp</AssemblyName>
         <OutputType>Exe</OutputType>
         <PreserveCompilationContext>true</PreserveCompilationContext>
@@ -9,6 +11,7 @@
         <!-- Always run on the latest runtime installed. -->
         <RuntimeFrameworkVersion>10.0.0</RuntimeFrameworkVersion>
         <RollForward>LatestMajor</RollForward>
+        <SkipHostDlls>true</SkipHostDlls>
     </PropertyGroup>
 
     <ItemGroup>

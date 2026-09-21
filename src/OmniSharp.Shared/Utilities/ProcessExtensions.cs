@@ -9,7 +9,6 @@ namespace OmniSharp.Utilities
     {
         public static void OnExit(this Process process, Action action)
         {
-            var gate = new object();
 
             process.Exited += (sender, e) =>
             {

@@ -37,6 +37,7 @@ namespace OmniSharp.Http
         {
             var config = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
                 .AddCommandLine(new[] { "--server.urls", $"http://{_serverInterface}:{_serverPort}" });
+            var configurationResult = new ConfigurationBuilder(_environment).Build();
 
             using (var app = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
                 .ConfigureWebHost(builder => builder
@@ -51,12 +52,15 @@ namespace OmniSharp.Http
                         serviceCollection.AddSingleton(NullEventEmitter.Instance);
                         serviceCollection.AddSingleton(_commandLinePlugins);
                         serviceCollection.AddSingleton(new HttpEnvironment { Port = _serverPort });
+                        serviceCollection.AddSingleton(configurationResult);
+                        Startup.AddOmniSharpServices(serviceCollection, _environment, NullEventEmitter.Instance, configurationResult);
                     })
                     .UseUrls($"http://{_serverInterface}:{_serverPort}")
                     .UseConfiguration(config.Build())
                     .UseEnvironment("OmniSharp")
                     .UseStartup(typeof(Startup)))
                 .Build())
+
             {
                 app.Start();
 

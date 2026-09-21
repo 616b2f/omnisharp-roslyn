@@ -3,7 +3,6 @@
 #load "scripts/archiving.cake"
 #load "scripts/artifacts.cake"
 #load "scripts/platform.cake"
-#load "scripts/validation.cake"
 
 using System.ComponentModel;
 using System.Net;
@@ -18,7 +17,6 @@ var installFolder = Argument("install-path",
 var publishAll = HasArgument("publish-all");
 var useGlobalDotNetSdk = HasArgument("use-global-dotnet-sdk");
 var testProjectArgument = Argument("test-project", "");
-var useDotNetTest = HasArgument("use-dotnet-test");
 
 Log.Context = Context;
 
@@ -111,6 +109,11 @@ void InstallDotNetSdk(BuildEnvironment env, BuildPlan plan, string version, stri
 Task("InstallDotNetSdk")
     .Does(() =>
 {
+    if (Platform.Current.IsWindows)
+    {
+        Environment.SetEnvironmentVariable("DOTNET_INSTALL_SKIP_TAR", "1");
+    }
+
     if (!useGlobalDotNetSdk)
     {
         foreach (var dotnetVersion in buildPlan.DotNetVersions)
@@ -205,16 +208,22 @@ Task("PrepareTestAssets:CakeTestAssets")
 
         var toolsFolder = CombinePaths(env.Folders.TestAssets, "test-projects", project, "tools");
         var packagesConfig = CombinePaths(toolsFolder, "packages.config");
+        var document = new XmlDocument();
+        document.Load(packagesConfig);
+        var package = (XmlElement)document.SelectSingleNode("/packages/package");
+        var packageId = package.GetAttribute("id");
+        var packageVersion = package.GetAttribute("version");
+        var packageFolder = CombinePaths(toolsFolder, $"{packageId}.{packageVersion}");
 
-        NuGetInstallFromConfig(packagesConfig, new NuGetInstallSettings
+        if (!DirectoryExists(packageFolder))
         {
-            OutputDirectory = toolsFolder,
-            Prerelease = true,
-            Verbosity = NuGetVerbosity.Quiet,
-            Source = new[] {
-                "https://api.nuget.org/v3/index.json"
-            }
-        });
+            var normalizedPackageId = packageId.ToLowerInvariant();
+            var packageFile = CombinePaths(toolsFolder, $"{normalizedPackageId}.{packageVersion}.nupkg");
+            DownloadFile(
+                $"https://api.nuget.org/v3-flatcontainer/{normalizedPackageId}/{packageVersion}/{normalizedPackageId}.{packageVersion}.nupkg",
+                File(packageFile));
+            Unzip(packageFile, packageFolder);
+        }
     });
 
 void BuildWithDotNetCli(BuildEnvironment env, string configuration)
@@ -286,48 +295,21 @@ Task("Test")
     .IsDependentOn("PrepareTestAssets")
     .Does(() =>
 {
-    var testTargetFramework = useDotNetTest ? "net10.0" : "net472";
     var testProjects = string.IsNullOrEmpty(testProjectArgument) ? buildPlan.TestProjects : testProjectArgument.Split(',');
-    var environment = new Dictionary<string, string>();
-
-    if (!useDotNetTest && Platform.Current.IsWindows)
-    {
-        environment.Add("DOTNET_PATH", env.Folders.DotNetSdk);
-    }
 
     foreach (var testProject in testProjects)
     {
         PrintBlankLine();
-        var instanceFolder = CombinePaths(env.Folders.Bin, configuration, testProject, testTargetFramework);
+        var instanceFolder = CombinePaths(env.Folders.Bin, configuration, testProject, env.TargetFramework);
         var targetPath = CombinePaths(instanceFolder, $"{testProject}.dll");
 
-        if (useDotNetTest || Platform.Current.IsWindows)
-        {
-            var logFile = CombinePaths(env.Folders.ArtifactsLogs, $"{testProject}-netsdk-result.xml");
-            var arguments = $"test \"{targetPath}\" --logger \"console;verbosity=normal\" --logger \"trx;LogFileName={logFile}\" --blame-hang-timeout 60sec";
+        var logFile = CombinePaths(env.Folders.ArtifactsLogs, $"{testProject}-netsdk-result.xml");
+        var arguments = $"test \"{targetPath}\" --logger \"console;verbosity=normal\" --logger \"trx;LogFileName={logFile}\" --blame-hang-timeout 60sec";
 
-            Console.WriteLine($"Executing: dotnet {arguments}");
+        Console.WriteLine($"Executing: dotnet {arguments}");
 
-            Run("dotnet", arguments, new RunOptions(workingDirectory: instanceFolder, environment: environment))
-                .ExceptionOnError($"Test {testProject} failed for {testTargetFramework}");
-        }
-        else
-        {
-            var logFile = CombinePaths(env.Folders.ArtifactsLogs, $"{testProject}-desktop-result.xml");
-
-            // Copy xunit executable to test folder to solve path errors
-            var xunitToolsFolder = CombinePaths(env.Folders.Tools, "xunit.runner.console", "tools", "net472");
-            var xunitInstancePath = CombinePaths(instanceFolder, "xunit.console.exe");
-            FileHelper.Copy(CombinePaths(xunitToolsFolder, "xunit.console.exe"), xunitInstancePath, overwrite: true);
-            FileHelper.Copy(CombinePaths(xunitToolsFolder, "xunit.runner.utility.net452.dll"), CombinePaths(instanceFolder, "xunit.runner.utility.net452.dll"), overwrite: true);
-            var arguments = $"\"{targetPath}\" -noshadow -parallel none -xml \"{logFile}\" -notrait category=failing";
-
-            if (Platform.Current.IsWindows)
-            {
-                Run(xunitInstancePath, arguments, instanceFolder)
-                    .ExceptionOnError($"Test {testProject} failed for {testTargetFramework}");
-            }
-        }
+        Run("dotnet", arguments, instanceFolder)
+            .ExceptionOnError($"Test {testProject} failed for {env.TargetFramework}");
     }
 });
 
@@ -406,60 +388,37 @@ Task("PublishNet10Builds")
 {
     foreach (var project in buildPlan.HostProjects)
     {
+        var outputFolder = CombinePaths(env.Folders.ArtifactsPublish, project, Platform.Current.RID, env.TargetFramework);
+        CreateRunScript(project, outputFolder, env.Folders.ArtifactsScripts);
+
         if (publishAll)
         {
             if (Platform.Current.IsWindows)
             {
-                PublishBuild(project, env, buildPlan, configuration, "win-x86", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "win-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "win-arm64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "win-x86", env.TargetFramework);
+                PublishBuild(project, env, buildPlan, configuration, "win-x64", env.TargetFramework);
+                PublishBuild(project, env, buildPlan, configuration, "win-arm64", env.TargetFramework);
             }
             else if (Platform.Current.IsMacOS)
             {
-                PublishBuild(project, env, buildPlan, configuration, "osx-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "osx-x64", env.TargetFramework);
+                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", env.TargetFramework);
             }
             else
             {
-                PublishBuild(project, env, buildPlan, configuration, "linux-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", "net10.0");
+                PublishBuild(project, env, buildPlan, configuration, "linux-x64", env.TargetFramework);
+                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", env.TargetFramework);
+                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", env.TargetFramework);
+                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", env.TargetFramework);
                 if (project == "OmniSharp.Stdio.Driver")
                 {
-                    PublishBuild(project, env, buildPlan, configuration, "linux-bionic-arm64", "net10.0");
+                    PublishBuild(project, env, buildPlan, configuration, "linux-bionic-arm64", env.TargetFramework);
                 }
-            }
-        }
-        else if (Platform.Current.IsWindows)
-        {
-            if (Platform.Current.IsX86)
-            {
-                PublishBuild(project, env, buildPlan, configuration, "win-x86", "net10.0");
-            }
-            else if (Platform.Current.IsX64)
-            {
-                PublishBuild(project, env, buildPlan, configuration, "win-x64", "net10.0");
-            }
-            else
-            {
-                PublishBuild(project, env, buildPlan, configuration, "win-arm64", "net10.0");
             }
         }
         else
         {
-            if (Platform.Current.IsMacOS)
-            {
-                PublishBuild(project, env, buildPlan, configuration, "osx-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "osx-arm64", "net10.0");
-            }
-            else
-            {
-                PublishBuild(project, env, buildPlan, configuration, "linux-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-arm64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-x64", "net10.0");
-                PublishBuild(project, env, buildPlan, configuration, "linux-musl-arm64", "net10.0");
-            }
+            PublishBuild(project, env, buildPlan, configuration, Platform.Current.RID, env.TargetFramework);
         }
     }
 });
@@ -474,28 +433,21 @@ string PublishBuild(string project, BuildEnvironment env, BuildPlan plan, string
 
     try
     {
-        var msBuildSettings = new DotNetMSBuildSettings()
-            .WithProperty("PackageVersion", env.VersionInfo.NuGetVersion)
-            .WithProperty("AssemblyVersion", env.VersionInfo.AssemblySemVer)
-            .WithProperty("FileVersion", env.VersionInfo.AssemblySemVer)
-            .WithProperty("InformationalVersion", env.VersionInfo.InformationalVersion)
-            .WithProperty("RuntimeFrameworkVersion", "10.0.0")
-            .WithProperty("RollForward", "LatestMajor");
-
-        if (framework == "net472")
-        {
-            msBuildSettings.WithProperty("UseRidGraph", "true");
-        }
-
         var publishSettings = new DotNetPublishSettings()
         {
             Framework = framework,
             Runtime = rid, // TODO: With everything today do we need to publish this with a rid?  This appears to be legacy bit when we used to push for all supported dotnet core rids.
             PublishReadyToRun = true, // Improve startup performance by applying some AOT compilation
-            SelfContained = false, // Since we are specifying a runtime identifier this defaults to true. We don't need to ship a runtime for net6 because we require the .NET SDK to be installed.
+            SelfContained = false, // Since we are specifying a runtime identifier this defaults to true. We don't need to ship a runtime because we require the .NET SDK to be installed.
             Configuration = configuration,
             OutputDirectory = outputFolder,
-            MSBuildSettings = msBuildSettings,
+            MSBuildSettings = new DotNetMSBuildSettings()
+                .WithProperty("PackageVersion", env.VersionInfo.NuGetVersion)
+                .WithProperty("AssemblyVersion", env.VersionInfo.AssemblySemVer)
+                .WithProperty("FileVersion", env.VersionInfo.AssemblySemVer)
+                .WithProperty("InformationalVersion", env.VersionInfo.InformationalVersion)
+                .WithProperty("RuntimeFrameworkVersion", "10.0.0")
+                .WithProperty("RollForward", "LatestMajor"),
             ToolPath = env.DotNetCommand,
             WorkingDirectory = env.WorkingDirectory,
             Verbosity = DotNetVerbosity.Minimal,
@@ -511,49 +463,11 @@ string PublishBuild(string project, BuildEnvironment env, BuildPlan plan, string
     CopyExtraDependencies(env, outputFolder);
     UpdateBindingRedirects(outputFolder);
 
-    var platformFolder = framework != "net472" ? $"{rid}-{framework}" : rid;
+    var platformFolder = rid;
     Package(project, platformFolder, outputFolder, env.Folders.ArtifactsPackage, env.Folders.DeploymentPackage);
 
     return outputFolder;
 }
-
-Task("PublishWindowsBuilds")
-    .WithCriteria(() => Platform.Current.IsWindows)
-    .IsDependentOn("Setup")
-    .Does(() =>
-{
-    foreach (var project in buildPlan.HostProjects)
-    {
-        string outputFolder;
-
-        if (publishAll)
-        {
-            var outputFolderX86 = PublishBuild(project, env, buildPlan, configuration, "win7-x86", "net472");
-            var outputFolderX64 = PublishBuild(project, env, buildPlan, configuration, "win7-x64", "net472");
-            var outputFolderArm64 = PublishBuild(project, env, buildPlan, configuration, "win10-arm64", "net472");
-
-            outputFolder = Platform.Current.IsX86
-                ? outputFolderX86
-                : Platform.Current.IsX64
-                    ? outputFolderX64
-                    : outputFolderArm64;
-        }
-        else if (Platform.Current.IsX86)
-        {
-            outputFolder = PublishBuild(project, env, buildPlan, configuration, "win7-x86", "net472");
-        }
-        else if (Platform.Current.IsX64)
-        {
-            outputFolder = PublishBuild(project, env, buildPlan, configuration, "win7-x64", "net472");
-        }
-        else
-        {
-            outputFolder = PublishBuild(project, env, buildPlan, configuration, "win10-arm64", "net472");
-        }
-
-        CreateRunScript(project, outputFolder, env.Folders.ArtifactsScripts);
-    }
-});
 
 Task("PublishNuGet")
     .IsDependentOn("InstallDotNetSdk")
@@ -575,7 +489,6 @@ Task("PublishNuGet")
 Task("Publish")
     .IsDependentOn("Build")
     .IsDependentOn("PublishNet10Builds")
-    .IsDependentOn("PublishWindowsBuilds")
     .IsDependentOn("PublishNuGet");
 
 /// <summary>
@@ -629,21 +542,7 @@ Task("Install")
 {
     foreach (var project in buildPlan.HostProjects)
     {
-        string platform;
-        if (Platform.Current.IsWindows)
-        {
-            platform = Platform.Current.IsX86
-                ? "win7-x86"
-                : Platform.Current.IsX64
-                    ? "win7-x64"
-                    : "win10-arm64";
-        }
-        else
-        {
-            platform = "mono";
-        }
-
-        var outputFolder = PathHelper.GetFullPath(CombinePaths(env.Folders.ArtifactsPublish, project, platform));
+        var outputFolder = PathHelper.GetFullPath(CombinePaths(env.Folders.ArtifactsPublish, project, Platform.Current.RID));
         var targetFolder = PathHelper.GetFullPath(CombinePaths(installFolder));
 
         DirectoryHelper.Copy(outputFolder, targetFolder);
